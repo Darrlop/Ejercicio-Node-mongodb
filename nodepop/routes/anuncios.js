@@ -29,4 +29,17 @@ router.get('/tags', async (req, res, next) => {
   }
 });
 
+// GET /anuncios/id
+// Devuelve el anuncio indicado en la id
+router.get('/:id', async (req, res, next) => {
+  try {
+    const elId = req.params.id;
+    const resultado = await Anuncio.findById(elId);
+    res.json({result: resultado});
+  } catch (error) {
+    console.log("Error en la petición de /anuncios/id:", error );
+    next(error);
+  }
+});
+
 module.exports = router;
