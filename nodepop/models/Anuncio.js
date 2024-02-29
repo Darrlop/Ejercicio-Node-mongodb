@@ -10,7 +10,6 @@ const anuncioSchema = mongoose.Schema({
   tags: {type: [String], required: true}
 });
 
-
 // Creo el modelo de anuncio y lo exporto
 
 const Anuncio = mongoose.model('Anuncio', anuncioSchema);
