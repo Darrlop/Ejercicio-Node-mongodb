@@ -5,16 +5,16 @@ const Anuncio = require('../models/Anuncio');
 
 // GET /anuncios
 // Devuelve todos los anuncios
-router.get('/', async (req, res, next) => {
-  try {
-    const resultado = await Anuncio.find();
-    res.json({result: resultado});
-    //res.render('index', {result: resultado}); 
-  } catch (error) {
-    console.log("Error en la petición de /anuncios:", error );
-    next(error);
-  }
-});
+// router.get('/', async (req, res, next) => {<
+//   try {
+//     const resultado = await Anuncio.find();
+//     res.json({result: resultado});
+//     //res.render('index', {result: resultado}); 
+//   } catch (error) {
+//     console.log("Error en la petición de /anuncios:", error );
+//     next(error);
+//   }
+// });
 
 // GET /anuncios/tag
 // Devuelve los tags existentes en la BD
@@ -41,5 +41,18 @@ router.get('/:id', async (req, res, next) => {
     next(error);
   }
 });
+
+router.get('/', async (req, res, next) => {
+  try {
+     const nombre = req.query.nombre;
+    console.log("--------------------", nombre);
+    const resultado = await Anuncio.findOne({nombre: nombre});
+    res.json({result: resultado});
+  } catch (error) {
+    console.log("Error en la petición de /anuncios/nombre:", error );
+    next(error);
+  }
+});
+
 
 module.exports = router;
