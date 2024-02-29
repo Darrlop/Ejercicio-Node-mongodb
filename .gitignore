@@ -1,0 +1,12 @@
+# Ignorar archivos generados automáticamente
+node_modules/
+dist/
+build/
+
+# Ignorar archivos de configuración local
+config.json
+
+# Ignorar archivos de registro
+*.log
+
+
