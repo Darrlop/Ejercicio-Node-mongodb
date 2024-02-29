@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const Anuncio = require('../models/Anuncio');
 
-/*
 
 // GET /anuncios
 // Devuelve todos los anuncios
@@ -29,6 +28,5 @@ router.get('/tags', async (req, res, next) => {
     next(error);
   }
 });
-*/
 
 module.exports = router;
