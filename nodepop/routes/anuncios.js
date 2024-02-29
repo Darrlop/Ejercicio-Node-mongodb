@@ -5,9 +5,32 @@ const Anuncio = require('../models/Anuncio');
 
 // GET /anuncios
 // Devuelve todos los anuncios
+// router.get('/', async (req, res, next) => {
+//   try {
+//     const resultado = await Anuncio.find();
+//     res.json({result: resultado});
+//     //res.render('index', {result: resultado}); 
+//   } catch (error) {
+//     console.log("Error en la petición de /anuncios:", error );
+//     next(error);
+//   }
+// });
+
+//GET /anuncios?start=1&limit4
+
 router.get('/', async (req, res, next) => {
   try {
-    const resultado = await Anuncio.find();
+
+    skip = req.query.skip;
+    limit = req.query.limit;
+    orden = req.query.sort;
+
+    //const resultado = await Anuncio.find().skip(skip).limit(limit);
+    //const resultado = await Anuncio.find().sort({[orden]: 1});
+    //const resultado = await Anuncio.find().sort({[orden]: 1}).skip(skip).limit(limit);
+
+    
+
     res.json({result: resultado});
     //res.render('index', {result: resultado}); 
   } catch (error) {
@@ -15,6 +38,10 @@ router.get('/', async (req, res, next) => {
     next(error);
   }
 });
+
+
+
+
 
 // GET /anuncios/tag
 // Devuelve los tags existentes en la BD
