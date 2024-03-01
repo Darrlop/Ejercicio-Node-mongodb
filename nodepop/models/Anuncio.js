@@ -10,6 +10,21 @@ const anuncioSchema = mongoose.Schema({
   tags: {type: [String], required: true}
 });
 
+
+// Métodos estáticos
+
+anuncioSchema.statics.listar = function(filtro, skip, limit, sort, fields) {
+  const query = Anuncio.find(filtro); // no lo ejecuto: devuelve un objeto query sin más
+
+  query.skip(skip);
+  query.limit(limit); 
+  query.sort(sort);
+  query.select(fields);
+  return query.exec(); // alejecutarlo, devuelve la promesa
+}
+
+
+
 // Creo el modelo de anuncio y lo exporto
 
 const Anuncio = mongoose.model('Anuncio', anuncioSchema);

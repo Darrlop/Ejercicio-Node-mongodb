@@ -30,9 +30,9 @@ app.use(express.static(path.join(__dirname, 'public')));
  * RUTAS DE LA API
  */
 
-//BALIZA -> crear el routes:   app.use('/api/anuncios', require(./routes/api/anuncios))
-app.use('/anuncios', require('./routes/anuncios'));
-app.use('/anuncios/tags', require('./routes/anuncios'));
+
+app.use('/api/anuncios', require('./routes/api/anuncios'));
+app.use('/api/anuncios/tags', require('./routes/api/anuncios'));
 
 /**
  * RUTAS DEL WEBSITE
@@ -40,6 +40,7 @@ app.use('/anuncios/tags', require('./routes/anuncios'));
 
 //app.use('/', indexRouter);
 //app.use('/users', usersRouter);
+// app.use('/', require('./routes/index'));
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 
