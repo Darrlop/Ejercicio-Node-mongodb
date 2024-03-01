@@ -69,4 +69,19 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
+router.get('/', async (req, res, next) => {
+  try {
+    const nombre = req.query.nombre;
+    const precio = req.query.precio;
+    console.log("--------------------", nombre);
+    //const resultado = await Anuncio.findOne({nombre: nombre});
+    const resultado = await Anuncio.find({precio: precio});
+    res.json({result: resultado});
+  } catch (error) {
+    console.log("Error en la petición de /anuncios/nombre:", error );
+    next(error);
+  }
+});
+
+
 module.exports = router;
