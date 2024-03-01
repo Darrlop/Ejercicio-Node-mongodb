@@ -15,12 +15,11 @@ const anuncioSchema = mongoose.Schema({
 
 anuncioSchema.statics.listar = function(filtro, skip, limit, sort, fields) {
   const query = Anuncio.find(filtro); // no lo ejecuto: devuelve un objeto query sin más
-
   query.skip(skip);
   query.limit(limit); 
   query.sort(sort);
   query.select(fields);
-  return query.exec(); // alejecutarlo, devuelve la promesa
+  return query.exec(); // al ejecutarlo, devuelve la promesa
 }
 
 

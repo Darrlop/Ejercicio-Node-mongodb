@@ -5,6 +5,77 @@ var router = express.Router();
 const Anuncio = require('../../models/Anuncio');
 
 
+
+// GET /api/anuncios?
+// Devuelve una lista de agente filtrada
+
+router.get('/', async (req, res, next) => {
+  try {
+
+    const filterByTag = req.query.tag;
+    const filterByVenta = req.query.venta;
+    const filterByNombre = req.query.nombre;
+    const precioMin = req.query.precioMin;
+    const precioMax = req.query.precioMax;
+    //const filterByRangoPrecio = "{$gte: " + req.query.precioMin + ", $lte: " + req.query.precioMax + "}";
+
+    const skip = req.query.skip;
+    const limit = req.query.limit;
+    const sort = req.query.sort;
+    const fields = req.query.fields;
+    const filter = {};
+
+    if (filterByTag)            filter.tags = filterByTag;
+    if (filterByVenta)          filter.venta = filterByVenta;
+    if (filterByNombre)         filter.nombre = filterByNombre;
+    if (precioMin && precioMax) filter.precio = {$gte: precioMin, $lte: precioMax};
+    
+
+    const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
+    res.json({resultado: anuncios});
+    
+  } catch (error) {
+    console.log("Error en la petición de /api/anuncios:", error );
+    next(error);
+  }
+});
+
+
+
+
+
+// GET /anuncios/tag
+// Devuelve los tags existentes en la BD
+
+router.get('/api/anuncios/tags', async (req, res, next) => {
+  try {
+    const resultado = await Anuncio.distinct("tags");
+    res.json({result: resultado});
+  } catch (error) {
+    console.log ("Error en la petición de /anuncios/tags:", error);
+    next(error);
+  }
+});
+
+// GET /api/anuncios/id
+// Devuelve el anuncio indicado en la id
+router.get('/:id', async (req, res, next) => {
+  try {
+    const elId = req.params.id;
+    const resultado = await Anuncio.findById(elId);
+    res.json({result: resultado});
+  } catch (error) {
+    console.log("Error en la petición de /anuncios/id:", error );
+    next(error);
+  }
+});
+
+
+
+module.exports = router;
+
+
+
 // GET /api/anuncios
 // Devuelve todos los anuncios
 // router.get('/', async (req, res, next) => {
@@ -51,75 +122,7 @@ const Anuncio = require('../../models/Anuncio');
 //     next(error);
 //   }
 // });
-
-// GET /api/anuncios?
-// Devuelve una lista de agente filtrada
-
-router.get('/', async (req, res, next) => {
-  try {
-
-    //// FILTROS
-    //// tag
-    //// tipo
-    //// precio, rango
-    //// nombre
-    const filterByTag = req.query.tag;
-    const filterByVenta = req.query.venta;
-    const filterByNombre = req.query.nombre;
-    const precioMin = req.query.precioMin;
-    const precioMax = req.precioMax;
-    //const filterByRangoPrecio = "{$gte: " + req.query.precioMin + ", $lte: " + req.query.precioMax + "}";
-
-    const skip = req.query.skip;
-    const limit = req.query.limit;
-    const sort = req.query.sort;
-    const fields = req.query.fields;
-    const filter = {};
-
-    if (filterByTag)          filter.tags = filterByTag;
-    if (filterByVenta)        filter.venta = filterByVenta;
-    if (filterByNombre)       filter.nombre = filterByNombre;
-    if (precioMin & precioMax)filter.precio = "{$gte: " + req.query.precioMin + ", $lte: " + req.query.precioMax + "}";
-    
-    const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
-    res.json({resultado: anuncios});
-    
-  } catch (error) {
-    console.log("Error en la petición de /api/anuncios:", error );
-    next(error);
-  }
-});
-
-
-
-
-
-// GET /anuncios/tag
-// Devuelve los tags existentes en la BD
-
-router.get('/api/anuncios/tags', async (req, res, next) => {
-  try {
-    const resultado = await Anuncio.distinct("tags");
-    res.json({result: resultado});
-  } catch (error) {
-    console.log ("Error en la petición de /anuncios/tags:", error);
-    next(error);
-  }
-});
-
-// GET /api/anuncios/id
-// Devuelve el anuncio indicado en la id
-router.get('/:id', async (req, res, next) => {
-  try {
-    const elId = req.params.id;
-    const resultado = await Anuncio.findById(elId);
-    res.json({result: resultado});
-  } catch (error) {
-    console.log("Error en la petición de /anuncios/id:", error );
-    next(error);
-  }
-});
-
+//
 // router.get('/', async (req, res, next) => {
 //   try {
 //     const nombre = req.query.nombre;
@@ -133,6 +136,3 @@ router.get('/:id', async (req, res, next) => {
 //     next(error);
 //   }
 // });
-
-
-module.exports = router;
