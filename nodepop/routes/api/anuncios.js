@@ -3,11 +3,12 @@
 var express = require('express');
 var router = express.Router();
 const Anuncio = require('../../models/Anuncio');
+const {query, validationResult} = require('express-validator');
 
 
 
 // GET /api/anuncios?
-// Devuelve un json con lista de anuncios filtrados
+// Devuelve un json con lista de anuncio filtrado
 
 router.get('/', async (req, res, next) => {
   try {
@@ -17,7 +18,6 @@ router.get('/', async (req, res, next) => {
     const filterByNombre = req.query.nombre;
     const precioMin = req.query.precioMin;
     const precioMax = req.query.precioMax;
-    //const filterByRangoPrecio = "{$gte: " + req.query.precioMin + ", $lte: " + req.query.precioMax + "}";
 
     const skip = req.query.skip;
     const limit = req.query.limit;
@@ -27,9 +27,9 @@ router.get('/', async (req, res, next) => {
 
     if (filterByTag)            filter.tags = filterByTag;
     if (filterByVenta)          filter.venta = filterByVenta;
-    if (filterByNombre)         filter.nombre = filterByNombre;
+    // if (filterByNombre)      filter.nombre = {$regex: +'/^'+ filterByNombre + '/'};
+    if (filterByNombre)         filter.nombre = {$regex: new RegExp('^' + filterByNombre)};
     if (precioMin && precioMax) filter.precio = {$gte: precioMin, $lte: precioMax};
-    
 
     const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
     res.json({resultado: anuncios});
