@@ -7,7 +7,7 @@ const Anuncio = require('../../models/Anuncio');
 
 
 // GET /api/anuncios?
-// Devuelve una lista de agente filtrada
+// Devuelve un json con lista de anuncios filtrados
 
 router.get('/', async (req, res, next) => {
   try {
@@ -40,10 +40,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-
-
-
-
 // GET /anuncios/tag
 // Devuelve los tags existentes en la BD
 
@@ -66,6 +62,35 @@ router.get('/:id', async (req, res, next) => {
     res.json({result: resultado});
   } catch (error) {
     console.log("Error en la petición de /anuncios/id:", error );
+    next(error);
+  }
+});
+
+
+// POST /api/anuncios (body)
+// Crea un anuncio
+router.post('/', async (req, res, next) => {
+
+  try {
+    const datos = req.body;
+    const anuncio = new Anuncio(datos);
+    const anuncioInsertado = await anuncio.save();
+    res.json( {result: anuncioInsertado} );
+    
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/anuncios/id
+// Elimina el anuncio indicado en la id
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const resultado = await Anuncio.deleteOne( {_id: id} );
+    res.json({estado: resultado});
+  } catch (error) {
+    console.log("Error en la petición delete de /api/anuncios/id:", error );
     next(error);
   }
 });
