@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('mongoose');
 
 // Establezo manejadores de eventos principales 
@@ -11,8 +12,7 @@ mongoose.connection.once('open', () => {
   console.log ('Conectado a MongoDB -> base de datos:', conex);
 });
 
-// Establezco la conexión con la BBDD
+// Establezco la conexión con la  y exporto
 
 mongoose.connect('mongodb://127.0.0.1:27017/nodepopDB');
-
 module.exports = mongoose.connection;

@@ -1,3 +1,5 @@
+'use strict';
+
 const mongoose = require('mongoose');
 
 // Defino el esquema que daré a los anuncios de la tienda
@@ -21,8 +23,6 @@ anuncioSchema.statics.listar = function(filtro, skip, limit, sort, fields) {
   query.select(fields);
   return query.exec(); // al ejecutarlo, devuelve la promesa
 }
-
-
 
 // Creo el modelo de anuncio y lo exporto
 

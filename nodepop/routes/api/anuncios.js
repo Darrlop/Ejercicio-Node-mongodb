@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 const Anuncio = require('../../models/Anuncio');
 const {query, validationResult} = require('express-validator');
-const validator = require('../../lib/validations'); 
+const validator = require('../../lib/validations');  //modularizadas las validaciones
 
 
 // GET /api/anuncios?
@@ -14,11 +14,32 @@ router.get('/', validator.validaQuery, async (req, res, next) => {
   try {
     validationResult(req).throw(); // genero excepción en caso de error en la validación 
 
+      // Func que desglosa el precio según formato y lo asigna a precioMin y precioMax
+      function desglosandoPrecio(){
+        const precioEnBruto = req.query.precio;
+        if (precioEnBruto !== undefined){
+          if (precioEnBruto.includes("-")){
+            const precios = precioEnBruto.split("-");
+            if (precioEnBruto.indexOf("-") === 0){  // -50
+              precioMin = 0.1;
+              precioMax = parseInt(precios[1]);
+            }else if (precioEnBruto.indexOf("-") === precioEnBruto.length - 1){  // 50-
+              precioMin = parseInt(precios[0]);
+              precioMax = Infinity;
+            }else { //50-60
+              precioMin = parseInt(precios[0]);
+              precioMax = parseInt(precios[1]);
+            }
+          }else{  //50
+            precioMin = precioMax = precioEnBruto;
+          }
+        }
+      }
+
+    let precioMin = undefined, precioMax = undefined;
     const filterByTag = req.query.tag;
     const filterByVenta = req.query.venta;
     const filterByNombre = req.query.nombre;
-    const precioMin = req.query.precioMin;
-    const precioMax = req.query.precioMax;
 
     const skip = req.query.skip;
     const limit = req.query.limit;
@@ -26,11 +47,12 @@ router.get('/', validator.validaQuery, async (req, res, next) => {
     const fields = req.query.fields;
     const filter = {};
 
-    if (filterByTag)            filter.tags = filterByTag;
-    if (filterByVenta)          filter.venta = filterByVenta;
-    if (filterByNombre)         filter.nombre = {$regex: new RegExp('^' + filterByNombre)};
-    if (precioMin && precioMax) filter.precio = {$gte: precioMin, $lte: precioMax};
+    desglosandoPrecio();
 
+    if (filterByTag)                                        filter.tags = filterByTag;
+    if (filterByVenta)                                      filter.venta = filterByVenta;
+    if (filterByNombre)                                     filter.nombre = {$regex: new RegExp('^' + filterByNombre)};
+    if (precioMin !== undefined && precioMax !== undefined) filter.precio = {$gte: precioMin, $lte: precioMax};
     // Determino si renderizo la vista con la información o la devuelvo en formato Json, según el origen
     if (req.originalUrl.startsWith('/api')) {
       const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
@@ -39,6 +61,7 @@ router.get('/', validator.validaQuery, async (req, res, next) => {
       res.locals.anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
       res.render('index', {marca: 'Nodepop' });
     } 
+
   } catch (error) {
     console.log("Error en la petición de /api/anuncios:", error );
     next(error);
@@ -46,7 +69,7 @@ router.get('/', validator.validaQuery, async (req, res, next) => {
 });
 
 
-// GET /anuncios/tag
+// GET /api/anuncios/tags
 // Devuelve los tags existentes en la BD
 
 router.get('/tags', async (req, res, next) => {
@@ -54,12 +77,12 @@ router.get('/tags', async (req, res, next) => {
     const resultado = await Anuncio.distinct("tags");
     res.json({result: resultado});
   } catch (error) {
-    console.log ("Error en la petición de /anuncios/tags:", error);
+    console.log ("Error en la petición de /api/anuncios/tags:", error);
     next(error);
   }
 });
 
-// GET /api/anuncios/id
+// GET /api/anuncios/<_id>
 // Devuelve el anuncio indicado en la id
 router.get('/:id', async (req, res, next) => {
   try {
@@ -91,8 +114,8 @@ router.post('/', validator.validaBody, async (req, res, next) => {
 });
 
 
-// DELETE /api/anuncios/id
-// Elimina el anuncio indicado en la id
+// DELETE /api/anuncios/<_id>
+// Elimina el anuncio indicado por la id
 router.delete('/:id', async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -104,68 +127,4 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-
 module.exports = router;
-
-
-
-// GET /api/anuncios
-// Devuelve todos los anuncios
-// router.get('/', async (req, res, next) => {
-//   try {
-//     const resultado = await Anuncio.find();
-//     res.json({result: resultado});
-//     //res.render('index', {result: resultado}); 
-//   } catch (error) {
-//     console.log("Error en la petición de /anuncios:", error );
-//     next(error);
-//   }
-// });
-
-//GET /api/anuncios?start=1&limit4  ....
-
-// router.get('/', async (req, res, next) => {
-//   try {
-
-//     skip = req.query.skip;
-//     limit = req.query.limit;
-//     orden = req.query.sort;
-//     elTag = req.query.tag;
-//     elNombre = req.query.nombre;
-//     operacion = req.query.venta // true-> venta; false-> compra/busqueda
-//     precioMin = req.query.precioMin;
-//     precioMax = req.query.precioMax;
-
-//      const resultado = await Anuncio.find().skip(skip).limit(limit);
-//     // const resultado = await Anuncio.find().sort({[orden]: 1});
-//     // const resultado = await Anuncio.find().sort({[orden]: 1}).skip(skip).limit(limit);
-//     // const resultado = await Anuncio.find({tags: elTag});
-//     // const resultado = await Anuncio.find({ $and: [{nombre: elNombre}, {tags: elTag}] })
-//     /// .sort({[orden]: 1}).skip(skip).limit(limit);
-//     // const resultado = await Anuncio.find({venta: operacion}).sort({[orden]: 1}).skip(skip).limit(limit);
-//     // const resultado = await Anuncio.find({precio: {$gte: precioMin, $lte: precioMax} })
-//     /// .sort({[orden]: 1}).skip(skip).limit(limit);
-
-//     //res.render ('anuncios', {resultado});
-//     res.json({result: resultado});
-    
-//     //res.render('index', {result: resultado}); 
-//   } catch (error) {
-//     console.log("Error en la petición de /anuncios:", error );
-//     next(error);
-//   }
-// });
-//
-// router.get('/', async (req, res, next) => {
-//   try {
-//     const nombre = req.query.nombre;
-//     const precio = req.query.precio;
-//     console.log("--------------------", nombre);
-//     //const resultado = await Anuncio.findOne({nombre: nombre});
-//     const resultado = await Anuncio.find({precio: precio});
-//     res.json({result: resultado});
-//   } catch (error) {
-//     console.log("Error en la petición de /anuncios/nombre:", error );
-//     next(error);
-//   }
-// });
