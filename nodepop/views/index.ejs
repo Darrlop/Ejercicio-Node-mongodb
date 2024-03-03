@@ -16,6 +16,7 @@
     <% anuncios.forEach( (anuncio) => { %>
       
       <p><b>Artículo: <%= anuncio.nombre.toUpperCase() %></b></p>
+      <p>ID: <%= anuncio.id %></p>
       <p>
         <% var tipo %>
         <% (anuncio.venta) ? tipo = "Se vende" : tipo = "Se Compra" %>
