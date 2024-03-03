@@ -1,15 +1,27 @@
 'use strict'
 
+/* Código fusionado con routes/api/anuncios.js
+/*
 var express = require('express');
 var router = express.Router();
 const Anuncio = require('../models/Anuncio');
+const {query, validationResult} = require('express-validator');
 
 
 // GET /
 // renderiza una lista de anuncios filtrados
 
-router.get('/', async (req, res, next) => {
+router.get('/', 
+[ //Array de validaciones
+  query('precioMin').isNumeric().withMessage("El precio ha de ser numérico"),
+  query('precioMax').isNumeric().withMessage("El precio ha de ser numérico"),
+  query('skip').isNumeric().withMessage("Los parámetros de paginación han de ser numéricos"),
+  query('limit').isNumeric().withMessage("Los parámetros de paginación han de ser numéricos")
+],
+async (req, res, next) => {
   try {
+
+    validationResult(req).throw();
 
     const filterByTag = req.query.tag;
     const filterByVenta = req.query.venta;
@@ -25,10 +37,9 @@ router.get('/', async (req, res, next) => {
 
     if (filterByTag)            filter.tags = filterByTag;
     if (filterByVenta)          filter.venta = filterByVenta;
-    if (filterByNombre)         filter.nombre = filterByNombre;
+    if (filterByNombre)         filter.nombre = {$regex: new RegExp('^' + filterByNombre)};
     if (precioMin && precioMax) filter.precio = {$gte: precioMin, $lte: precioMax}; // rango de precio
     
-
     //const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
     res.locals.anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
     res.render('index', {marca: 'Nodepop' });
@@ -46,5 +57,6 @@ router.get('/', async (req, res, next) => {
 // });
 
 
-
+/*
 module.exports = router;
+*/

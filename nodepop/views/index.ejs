@@ -23,7 +23,12 @@
       </p>
       <p>Precio: <%= anuncio.precio %> €</p>
       <p>Tags: <%= anuncio.tags %></p>
-      <p>Foto: <%= anuncio.foto %>.png</p>
+      <!--
+        <>Foto: <%= anuncio.foto %></p>
+       -->
+       <% var nombreFoto %>
+       <% (anuncio.foto !== "") ? nombreFoto = anuncio.foto : nombreFoto = "----"%>
+       <p>Foto: <%= nombreFoto %>
       <hr>
 
     <% }) %>

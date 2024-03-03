@@ -30,7 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
  * RUTAS DE LA API
  */
 
-
 app.use('/api/anuncios', require('./routes/api/anuncios'));
 app.use('/api/anuncios/tags', require('./routes/api/anuncios'));
 
@@ -38,16 +37,15 @@ app.use('/api/anuncios/tags', require('./routes/api/anuncios'));
  * RUTAS DEL WEBSITE
  */
 
-//app.use('/', indexRouter);
-//app.use('/users', usersRouter);
+// app.use('/', indexRouter);
+// app.use('/users', usersRouter);
 // app.use('/', require('./routes/index'));
-app.use('/', require('./routes/index'));
+app.use('/', require('./routes/api/anuncios'));
 app.use('/users', require('./routes/users'));
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next (createError(404));
 });
 
 // // error handler
@@ -61,29 +59,30 @@ app.use(function(req, res, next) {
 //   res.render('error');
 // });
 
-
 // error handler
 app.use(function(err, req, res, next) {
 
   // Errores de validación
-
-
-
+  if (err.array) { // <- detecto que el error proviene de express validator
+    const infoError = err.array({})[0];
+    
+    err.message = `Error de validación en ${infoError.location}`;
+    err.submessage = `${infoError.path} : ${infoError.msg}`;
+    err.status = 422; // cambio el código de error a uno más indicativo
+  }
 
   // Establezco error por defecto
   res.status(err.status || 500);
 
-
-
   // Fallo en API -> respondo en formato Json
   if (req.originalUrl.startsWith('/api/')) {
-      res.json({ error: err.message });
-      return;
+    res.json({ error: err.message, descripcion: err.submessage });
+    return;
   }
 
-  
   // set locals, only providing error in development
   res.locals.message = err.message;
+  res.locals.submessage = err.submessage;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page

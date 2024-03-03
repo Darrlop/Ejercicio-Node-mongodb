@@ -4,14 +4,15 @@ var express = require('express');
 var router = express.Router();
 const Anuncio = require('../../models/Anuncio');
 const {query, validationResult} = require('express-validator');
-
+const validator = require('../../lib/validations'); 
 
 
 // GET /api/anuncios?
-// Devuelve un json con lista de anuncio filtrado
+// Devuelve un json con lista de anuncio según filtros
 
-router.get('/', async (req, res, next) => {
+router.get('/', validator.validaQuery, async (req, res, next) => {
   try {
+    validationResult(req).throw(); // genero excepción en caso de error en la validación 
 
     const filterByTag = req.query.tag;
     const filterByVenta = req.query.venta;
@@ -27,23 +28,28 @@ router.get('/', async (req, res, next) => {
 
     if (filterByTag)            filter.tags = filterByTag;
     if (filterByVenta)          filter.venta = filterByVenta;
-    // if (filterByNombre)      filter.nombre = {$regex: +'/^'+ filterByNombre + '/'};
     if (filterByNombre)         filter.nombre = {$regex: new RegExp('^' + filterByNombre)};
     if (precioMin && precioMax) filter.precio = {$gte: precioMin, $lte: precioMax};
 
-    const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
-    res.json({resultado: anuncios});
-    
+    // Determino si renderizo la vista con la información o la devuelvo en formato Json, según el origen
+    if (req.originalUrl.startsWith('/api')) {
+      const anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
+      res.json({ resultado: anuncios });
+    } else {
+      res.locals.anuncios = await Anuncio.listar(filter, skip, limit, sort, fields);
+      res.render('index', {marca: 'Nodepop' });
+    } 
   } catch (error) {
     console.log("Error en la petición de /api/anuncios:", error );
     next(error);
   }
 });
 
+
 // GET /anuncios/tag
 // Devuelve los tags existentes en la BD
 
-router.get('/api/anuncios/tags', async (req, res, next) => {
+router.get('/tags', async (req, res, next) => {
   try {
     const resultado = await Anuncio.distinct("tags");
     res.json({result: resultado});
@@ -61,7 +67,7 @@ router.get('/:id', async (req, res, next) => {
     const resultado = await Anuncio.findById(elId);
     res.json({result: resultado});
   } catch (error) {
-    console.log("Error en la petición de /anuncios/id:", error );
+    console.log("Error en la petición de /api/anuncios/id:", error );
     next(error);
   }
 });
@@ -69,18 +75,21 @@ router.get('/:id', async (req, res, next) => {
 
 // POST /api/anuncios (body)
 // Crea un anuncio
-router.post('/', async (req, res, next) => {
-
+router.post('/', validator.validaBody, async (req, res, next) => {
   try {
+    validationResult(req).throw(); // genero excepción en caso de error en la validación 
+
     const datos = req.body;
     const anuncio = new Anuncio(datos);
     const anuncioInsertado = await anuncio.save();
     res.json( {result: anuncioInsertado} );
     
   } catch (error) {
+    console.log("Error en la petición post de /api/anuncios")
     next(error);
   }
 });
+
 
 // DELETE /api/anuncios/id
 // Elimina el anuncio indicado en la id
@@ -94,7 +103,6 @@ router.delete('/:id', async (req, res, next) => {
     next(error);
   }
 });
-
 
 
 module.exports = router;
