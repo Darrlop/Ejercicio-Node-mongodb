@@ -87,13 +87,11 @@ Con ello formateamos la BD y cargamos unos datos mínimos para su correcto funci
 ### ACCESO
 - Acceso a la API usando el navegador, con la información de respuesta en formato Json.
   - ``` http://localhost:3000/api/anuncios``` 
-- Acceso directamente a Nodepop por medio del navegador usando, siendo al información de respuesta renderizada en una vista.
+- Acceso directamente a Nodepop por medio del navegador, siendo la información de respuesta renderizada en una vista.
   - ``` http://localhost:3000/``` 
 
 La documentación se centrará en el API, y se mostrará los ejemplos de respuesta en formato Json. El acceso a Nodepop se realiza de igual manera, pero variando la url de acceso como se indica arriba.
-Ejemplo de respuesta renderizada en vista, a modo de guía general:
 
-![alt text](image.png)
 
 ### PETICIONES
 
