@@ -1,6 +1,11 @@
-https://markdown.es/sintaxis-markdown/
 
+--- NOTA:
 
+Hola, Javier.
+
+Aprovecho el documento para un comentarios:
+
+- Las validaciones creo que las he hecho bastante completas. No sabía hasta que punto teníamos que extenderlas más. Creo que cubro los aspectos importantes y he manejado varias, incluida alguna custom. Espero que sean suficientes.
 
 ---
 ---
@@ -8,6 +13,7 @@ https://markdown.es/sintaxis-markdown/
 ---
 ---
 
+>David Arrarás López
 
 ### Introducción
 
